@@ -1,222 +1,212 @@
-# Animal-Image-Classifier-Cat-Dog-Fox-Prediction-with-TensorFlow
-A complete deep-learning pipeline for classifying animal images into cat, dog, or fox using a TensorFlow/Keras model.
-This repository includes a ready-to-run Python script for model inference, batch prediction, evaluation, and image visualization, optimized for VS Code.
+# Animal Image Classifier 🐱🐶🦊
 
-📌 Table of Contents
+A simple and modular workflow for running predictions on animal images using a pre-trained deep learning model. This repository provides an easy-to-use TensorFlow inference pipeline for image classification.
 
-Overview
+## 📋 Table of Contents
 
-Key Features
+- [Overview](#overview)
+- [Features](#features)
+- [Model Description](#model-description)
+- [Project Structure](#project-structure)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [Example Output](#example-output)
+- [Troubleshooting](#troubleshooting)
+- [Future Work](#future-work)
+- [License](#license)
 
-Model Overview
+## 🎯 Overview
 
-Project Structure
+This project provides a ready-to-use prediction system that loads images from a directory, preprocesses them to match the model's input format, and outputs predicted labels. A filename-based validation method is included for quick accuracy evaluation.
 
-Installation
+**Ideal for:** Students, researchers, and developers working with image classification and TensorFlow inference pipelines.
 
-Configuration
+## ✨ Features
 
-Running the Classifier
+### 1. **Ready-to-Use Prediction Script**
+- Single Python script (`test_animals.py`) handles the entire inference pipeline
+- Automatic model loading, preprocessing, prediction, and accuracy computation
 
-Prediction Output Example
+### 2. **Automatic Image Preprocessing**
+- Resizes images to 224×224×3
+- Converts to arrays
+- Normalizes inputs using `preprocess_input`
 
-Troubleshooting
+### 3. **Batch Image Evaluation**
+- Runs predictions on all `.jpg`, `.jpeg`, `.png`, and `.webp` files in the test directory
 
-Future Improvements
+### 4. **Optional Image Display**
+- Uses Matplotlib to preview each image before running prediction
 
-License
+### 5. **Configurable Class Mapping**
+- Class names are manually defined to match your model's output layer
 
-📘 Overview
+## 🧠 Model Description
 
-This project implements an image classification system that predicts whether an input image contains a:
+The classifier uses a TensorFlow/Keras model trained to recognize three categories:
 
-🐱 Cat
+- **cat** 🐱
+- **dog** 🐶
+- **fox** 🦊
 
-🐶 Dog
+The script supports any model saved in Keras `.h5` or TensorFlow `SavedModel` format. The only requirement is that the model outputs three probabilities in the same order as the `CLASSES` list defined in the script.
 
-🦊 Fox
-
-Using a pre-trained TensorFlow model, the script loads all images in a test directory, preprocesses each one, displays the image, and outputs the predicted label.
-
-The project is structured for clarity, modularity, and easy extension—suitable for students, researchers, and developers working with computer vision.
-
-🚀 Key Features
-✔️ 1. Ready-to-Run Prediction Pipeline
-
-Just update your model path and test directory—everything else works automatically.
-
-✔️ 2. Image Preprocessing + Display
-
-Automatic resizing: 224×224×3
-
-Normalization using preprocess_input()
-
-Optional Matplotlib preview of each test image
-
-✔️ 3. Batch Testing
-
-The script evaluates every image in your test folder and produces:
-
-predicted class
-
-total accuracy
-
-filename-based ground truth matching
-
-✔️ 4. Clean & Modular Code
-
-Separate functions for:
-
-loading images
-
-preprocessing
-
-predicting
-
-evaluation
-
-Easy to extend for new datasets.
-
-✔️ 5. VS Code Friendly
-
-No Jupyter dependencies — built to run directly via:
-
-python test_animals.py
-
-🧠 Model Overview
-
-This project expects a TensorFlow/Keras model (e.g., .h5 or SavedModel format) trained on images of cats, dogs, and foxes.
-The model must output three logits/probabilities corresponding to:
-
-["cat", "dog", "fox"]
-
-
-The inference script supports any architecture, including:
-
-MobileNetV2
-
-ResNet50
-
-EfficientNet
-
-Custom CNNs
-
-📁 Project Structure
+## 📁 Project Structure
+```
 animal-classifier/
 │
 ├── models/
-│   └── animal_model.h5          # Your trained model
+│   └── animal_model.h5              # Your trained model
 │
 ├── animal_images_dl/
-│   └── test/                    # Test images for prediction
+│   └── test/                        # Images for prediction
+│       ├── cat_01.jpg
+│       ├── dog_02.png
+│       └── fox_03.webp
 │
-├── test_animals.py              # Main inference & evaluation script
-│
-└── README.md                    # Documentation
+├── test_animals.py                  # Main Python script
+├── requirements.txt                 # Python dependencies
+└── README.md                        # This file
+```
 
-Supported image formats:
-.jpg, .jpeg, .png, .webp
+**Supported image formats:**
+- `.jpg`
+- `.jpeg`
+- `.png`
+- `.webp`
 
-🔧 Installation
+## 🚀 Installation
 
-Install required packages:
+### Prerequisites
 
+- Python 3.7 or higher
+- pip package manager
+
+### Step 1: Clone the Repository
+```bash
+git clone https://github.com/yourusername/animal-classifier.git
+cd animal-classifier
+```
+
+### Step 2: Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+Or install manually:
+```bash
 pip install tensorflow matplotlib numpy
+```
 
+### Step 3: (Optional) Create a Virtual Environment
 
-(Optional) Add a virtual environment:
-
+**Windows:**
+```bash
 python -m venv venv
-source venv/bin/activate   # on macOS/Linux
-venv\Scripts\activate      # on Windows
+venv\Scripts\activate
+```
 
-⚙️ Configuration
+**macOS/Linux:**
+```bash
+python -m venv venv
+source venv/bin/activate
+```
 
-Inside test_animals.py, modify the following:
+## ⚙️ Configuration
 
+Open `test_animals.py` and update the following section:
+```python
 MODEL_PATH = "models/animal_model.h5"
 TEST_DIR   = "animal_images_dl/test"
 CLASSES    = ["cat", "dog", "fox"]
+```
 
-Important:
+**Ensure:**
+1. ✅ The model path is correct
+2. ✅ Your test directory contains images
+3. ✅ The class list matches the model's output order
 
-CLASSES must match the order of your model’s output layer
+## 💻 Usage
 
-Images should be placed in the TEST_DIR folder before running
-
-▶️ Running the Classifier
-
-From VS Code terminal or any console:
-
+Run the script from your terminal:
+```bash
 python test_animals.py
-
+```
 
 The script will:
+1. Load the model
+2. Scan the test directory
+3. Display each image (optional)
+4. Predict its class
+5. Compare prediction to filename
+6. Print overall accuracy
 
-Load your trained model
-
-Loop through all images in the test directory
-
-Display each image
-
-Print predicted class
-
-Compute filename-based accuracy
-
-📊 Prediction Output Example
+## 📊 Example Output
+```
 Loading model from: models/animal_model.h5
 Running tests on directory: animal_images_dl/test
 
-Prediction for cat_01.jpg: cat
-Prediction for dog_33.png: dog
-Prediction for wild_fox.webp: fox
+Prediction for cat_02.jpg: cat
+Prediction for dog_15.png: dog
+Prediction for fox_08.webp: fox
 
 Total images: 52
 Correct by filename: 47
 Accuracy (by filename match): 0.9038
+```
 
-🛠️ Troubleshooting
-❗ “Model not found”
+## 🔧 Troubleshooting
 
-Check:
+### "Model not found"
+**Solution:** Check that `MODEL_PATH` correctly points to your model file.
 
-MODEL_PATH = "models/animal_model.h5"
+### "No images found"
+**Solution:** Ensure `TEST_DIR` contains supported image files (`.jpg`, `.jpeg`, `.png`, `.webp`).
 
+### Incorrect predictions
+**Possible causes:**
+- Verify class order in `CLASSES`
+- Review model training quality
+- Check for mislabeled filenames
+- Ensure consistent image sizes/resolution
 
-Make sure the file exists.
-
-❗ Prediction results are wrong
-
-Possible causes:
-
-wrong class order
-
-poor model training
-
-images mislabeled
-
-dataset imbalance
-
-❗ "No images found"
-
-Ensure test folder contains .jpg, .jpeg, .png, or .webp.
-
-❗ Model input size mismatch
-
-Your model must accept 224×224×3 or you must change this in the script:
-
+### Input size mismatch
+If your model expects a different input size, modify this line:
+```python
 image_utils.load_img(image_path, target_size=(224, 224))
+```
 
-🔮 Future Improvements
+Change `(224, 224)` to match your model's expected input dimensions.
 
-Add a confusion matrix
+## 🚧 Future Work
 
-Add confidence scores to output
+- [ ] Add precision, recall, and confusion matrix
+- [ ] Display confidence scores for predictions
+- [ ] Convert model to ONNX or TFLite
+- [ ] Implement a FastAPI/Flask API endpoint
+- [ ] Add drag-and-drop web interface
+- [ ] Provide official training notebooks
+- [ ] Implement test-time augmentation
+- [ ] Support for additional animal classes
+- [ ] Real-time webcam prediction
 
-Create a FastAPI/Flask API for live predictions
+## 📄 License
 
-Convert model to ONNX or TensorFlow Lite
+MIT License
 
-Add GUI or drag-and-drop web interface
+You may freely use, modify, and distribute this project for personal or commercial purposes.
 
-Add training scripts + augmentation
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📧 Contact
+
+For questions or feedback, please open an issue on GitHub.
+
+---
+
+**⭐ If you find this project helpful, please give it a star!**
