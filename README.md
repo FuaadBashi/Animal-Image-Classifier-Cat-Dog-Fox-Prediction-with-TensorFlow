@@ -14,19 +14,19 @@ source .venv/bin/activate
 python -m pip install tensorflow matplotlib numpy pillow
 ```
 
-Set `MODEL_PATH`, `TEST_DIR`, and `CLASSES` in `main.py`, then run:
+Supply your model and images using the CLI:
 
 ```bash
-python main.py
+python main.py --model models/animal_model.h5 --images animal_images_dl/test
 ```
 
 The defaults expect `models/animal_model.h5` and `animal_images_dl/test`, with classes ordered as `cat`, `dog`, `fox`.
 
 ## Code to explore
 
-- `show_image`: previews each image with Matplotlib; close the preview to continue.
+- `show_image`: previews images only when `--show` is supplied.
 - `make_predictions`: prepares one image and calls the model.
-- `run_tests`: iterates over supported image files and prints predictions.
+- `run_tests`: iterates over supported files in sorted order and rejects malformed model outputs.
 
 ## Evaluation boundary
 

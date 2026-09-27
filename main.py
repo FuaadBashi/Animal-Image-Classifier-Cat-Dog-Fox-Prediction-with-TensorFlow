@@ -1,93 +1,75 @@
-# test_animals.py
+import argparse
+from pathlib import Path
 
-import os
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 
-from tensorflow.keras.preprocessing import image as image_utils
-from tensorflow.keras.applications.imagenet_utils import preprocess_input
-from tensorflow.keras.models import load_model
+MODEL_PATH = Path(__file__).parent / 'models/animal_model.h5'
+TEST_DIR = Path(__file__).parent / 'animal_images_dl/test'
+CLASSES = ['cat', 'dog', 'fox']
 
 
-# Path to your saved Keras/TensorFlow model
-MODEL_PATH = "models/animal_model.h5"      
+def show_image(image_path):
+    import matplotlib.pyplot as plt
+    import matplotlib.image as mpimg
 
-# Path to your test directory with images
-TEST_DIR = "animal_images_dl/test"     
-
-# Class labels in the same order as your model's output
-CLASSES = ["cat", "dog", "fox"]           
-
-
-
-def show_image(image_path: str) -> None:
-    image = mpimg.imread(image_path)
-    plt.imshow(image)
-    plt.axis("off")
+    plt.imshow(mpimg.imread(image_path))
+    plt.axis('off')
     plt.show()
+    plt.close()
 
 
-def make_predictions(model, image_path: str) -> np.ndarray:
-    """
-    Load an image, preprocess it, and return the model predictions.
-    Assumes input size (224, 224, 3).
-    """
-    # Optional: show the image being predicted
-    show_image(image_path)
+def make_predictions(model, image_path, *, show=False):
+    from tensorflow.keras.preprocessing import image as image_utils
+    from tensorflow.keras.applications.imagenet_utils import preprocess_input
 
-    # Load and preprocess
+    if show:
+        show_image(image_path)
     image = image_utils.load_img(image_path, target_size=(224, 224))
-    image = image_utils.img_to_array(image)
-    image = image.reshape(1, 224, 224, 3)
-    image = preprocess_input(image)
-
-    # Predict
-    preds = model.predict(image)
-    return preds
+    batch = np.expand_dims(image_utils.img_to_array(image), axis=0)
+    return model.predict(preprocess_input(batch), verbose=0)
 
 
-def run_tests(model, test_dir: str) -> None:
-    """
-    Loop through all images in test_dir, make predictions,
-    and calculate a simple filename-based accuracy.
-    """
-    total_correct = 0
-    total_images = 0
-
-    for filename in os.listdir(test_dir):
-        if filename.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
-            image_path = os.path.join(test_dir, filename)
-
-            # Get model predictions
-            predictions = make_predictions(model, image_path)
-            predicted_index = int(np.argmax(predictions))
-            predicted_class = CLASSES[predicted_index]
-
-            print(f"Prediction for {filename}: {predicted_class}")
-            total_images += 1
-
-            # Very simple check: does the filename contain the class name?
-            # e.g. "cat_001.jpg" should contain "cat"
-            if predicted_class.lower() in filename.lower():
-                total_correct += 1
-
-    if total_images == 0:
-        print("No images found in test directory.")
-        return
-
-    accuracy = total_correct / total_images
-    print(f"\nTotal images: {total_images}")
-    print(f"Correct by filename: {total_correct}")
-    print(f"Accuracy (by filename match): {accuracy:.4f}")
+def predicted_label(predictions, classes):
+    values = np.asarray(predictions)
+    if values.shape != (1, len(classes)) or not np.isfinite(values).all():
+        raise ValueError('Expected one finite prediction per configured class')
+    return classes[int(values[0].argmax())]
 
 
+def run_tests(model, test_dir, *, classes=CLASSES, show=False):
+    images = sorted(p for p in Path(test_dir).iterdir()
+                    if p.is_file() and p.suffix.lower() in {'.jpg', '.jpeg', '.png', '.webp'})
+    if not images:
+        raise ValueError('No supported images found in the input directory')
+    correct = 0
+    for path in images:
+        label = predicted_label(make_predictions(model, path, show=show), classes)
+        print(f'Prediction for {path.name}: {label}')
+        correct += label.lower() in path.stem.lower()
+    ratio = correct / len(images)
+    print(f'Filename-match ratio: {correct}/{len(images)} ({ratio:.4f})')
+    return ratio
 
-if __name__ == "__main__":
-    # Load the model
-    print(f"Loading model from: {MODEL_PATH}")
-    model = load_model(MODEL_PATH)
 
-    # Run tests
-    print(f"Running tests on directory: {TEST_DIR}")
-    run_tests(model, TEST_DIR)
+def main(argv=None):
+    parser = argparse.ArgumentParser(description='Run a supplied animal classification model')
+    parser.add_argument('--model', type=Path, default=MODEL_PATH)
+    parser.add_argument('--images', type=Path, default=TEST_DIR)
+    parser.add_argument('--classes', nargs='+', default=CLASSES)
+    parser.add_argument('--show', action='store_true', help='Preview each image interactively')
+    args = parser.parse_args(argv)
+    if not args.model.is_file():
+        parser.error(f'Model file not found: {args.model}')
+    if not args.images.is_dir():
+        parser.error(f'Image directory not found: {args.images}')
+    if len(set(args.classes)) != len(args.classes):
+        parser.error('Class labels must be unique')
+    from tensorflow.keras.models import load_model
+    try:
+        run_tests(load_model(args.model), args.images, classes=args.classes, show=args.show)
+    except (OSError, ValueError) as exc:
+        parser.error(str(exc))
+
+
+if __name__ == '__main__':
+    main()
