@@ -1,0 +1,14 @@
+[project]
+name = "animal-classifier"
+version = "1.0.0"
+description = "Cat, dog and fox image classifier: VGG16 transfer learning with TensorFlow."
+requires-python = ">=3.10"
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

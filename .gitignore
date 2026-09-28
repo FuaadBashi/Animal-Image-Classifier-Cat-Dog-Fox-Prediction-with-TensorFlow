@@ -1,0 +1,16 @@
+# Added: build output, editor and OS files
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+.idea/
+.vscode/
+
+# Datasets and trained models are too large for git
+animal_images_dl/
+models/
+*.h5
+*.keras
